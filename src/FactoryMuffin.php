@@ -19,7 +19,7 @@ use League\FactoryMuffin\Exceptions\ModelNotFoundException;
 use League\FactoryMuffin\Generators\GeneratorFactory;
 use League\FactoryMuffin\ModelCreator\ModelCreatorInterface;
 use League\FactoryMuffin\ModelCreator\WithoutConstructorModelCreator;
-use League\FactoryMuffin\ParameterSetter\ByMethodParameterSetter;
+use League\FactoryMuffin\ParameterSetter\ByReflectionParameterSetter;
 use League\FactoryMuffin\ParameterSetter\ParameterSetterInterface;
 use League\FactoryMuffin\Stores\ModelStore;
 use League\FactoryMuffin\Stores\StoreInterface;
@@ -81,7 +81,7 @@ class FactoryMuffin
         $this->store = $store ?: new ModelStore();
         $this->factory = $factory ?: new GeneratorFactory();
         $this->setModelCreator(new WithoutConstructorModelCreator());
-        $this->setParameterSetter(new ByMethodParameterSetter());
+        $this->setParameterSetter(new ByReflectionParameterSetter());
     }
 
     public function setModelCreator(ModelCreatorInterface $modelCreator)
