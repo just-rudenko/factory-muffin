@@ -17,6 +17,10 @@ use League\FactoryMuffin\Exceptions\DefinitionNotFoundException;
 use League\FactoryMuffin\Exceptions\DirectoryNotFoundException;
 use League\FactoryMuffin\Exceptions\ModelNotFoundException;
 use League\FactoryMuffin\Generators\GeneratorFactory;
+use League\FactoryMuffin\ModelCreator\ModelCreatorInterface;
+use League\FactoryMuffin\ModelCreator\WithoutConstructorModelCreator;
+use League\FactoryMuffin\ParameterSetter\ByMethodParameterSetter;
+use League\FactoryMuffin\ParameterSetter\ParameterSetterInterface;
 use League\FactoryMuffin\Stores\ModelStore;
 use League\FactoryMuffin\Stores\StoreInterface;
 use RecursiveDirectoryIterator;
@@ -55,6 +59,16 @@ class FactoryMuffin
     protected $factory;
 
     /**
+     * @var ModelCreatorInterface
+     */
+    private $modelCreator;
+
+    /**
+     * @var ParameterSetterInterface
+     */
+    private $parameterSetter;
+
+    /**
      * Create a new factory muffin instance.
      *
      * @param \League\FactoryMuffin\Stores\StoreInterface|null       $store   The store instance.
@@ -66,6 +80,18 @@ class FactoryMuffin
     {
         $this->store = $store ?: new ModelStore();
         $this->factory = $factory ?: new GeneratorFactory();
+        $this->setModelCreator(new WithoutConstructorModelCreator());
+        $this->setParameterSetter(new ByMethodParameterSetter());
+    }
+
+    public function setModelCreator(ModelCreatorInterface $modelCreator)
+    {
+        $this->modelCreator = $modelCreator;
+    }
+
+    public function setParameterSetter(ParameterSetterInterface $parameterSetter)
+    {
+        $this->parameterSetter = $parameterSetter;
     }
 
     /**
@@ -180,7 +206,7 @@ class FactoryMuffin
             return call_user_func($maker, $class);
         }
 
-        return new $class();
+        return $this->modelCreator->create($class);
     }
 
     /**
@@ -239,14 +265,7 @@ class FactoryMuffin
         foreach ($attr as $key => $kind) {
             $value = $this->factory->generate($kind, $model, $this);
 
-            $setter = 'set'.ucfirst(static::camelize($key));
-
-            // check if there is a setter and use it instead
-            if (method_exists($model, $setter) && is_callable([$model, $setter])) {
-                $model->$setter($value);
-            } else {
-                $model->$key = $value;
-            }
+            $this->parameterSetter->set($model, $key, $value);
         }
     }
 
@@ -285,15 +304,20 @@ class FactoryMuffin
      * Please use the getDefinition method for that.
      *
      * @param string $name The model definition name.
+     * @param string|null $parentDefinition The parent model definition name.
      *
      * @throws \League\FactoryMuffin\Exceptions\DefinitionAlreadyDefinedException
      *
      * @return \League\FactoryMuffin\Definition
      */
-    public function define($name)
+    public function define($name, $parentDefinition = null)
     {
         if (isset($this->definitions[$name])) {
             throw new DefinitionAlreadyDefinedException($name);
+        }
+
+        if (null !== $parentDefinition) {
+            return $this->definitions[$name] = clone $this->getDefinition($parentDefinition);
         }
 
         if (strpos($name, ':') !== false) {

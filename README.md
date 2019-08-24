@@ -1,18 +1,12 @@
 Factory Muffin 3.0
 ==================
 
-[![StyleCI Status](https://styleci.io/repos/7930464/shield)](https://styleci.io/repos/7930464)
-[![Build Status](https://img.shields.io/travis/thephpleague/factory-muffin.svg?style=flat-square)](https://travis-ci.org/thephpleague/factory-muffin)
-[![Coverage Status](https://img.shields.io/scrutinizer/coverage/g/thephpleague/factory-muffin.svg?style=flat-square)](https://scrutinizer-ci.com/g/thephpleague/factory-muffin/code-structure)
-[![Quality Score](https://img.shields.io/scrutinizer/g/thephpleague/factory-muffin.svg?style=flat-square)](https://scrutinizer-ci.com/g/thephpleague/factory-muffin)
-[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
-[![Latest Version](https://img.shields.io/github/release/thephpleague/factory-muffin.svg?style=flat-square)](https://github.com/thephpleague/factory-muffin/releases)
-[![Total Downloads](https://img.shields.io/packagist/dt/league/factory-muffin.svg?style=flat-square)](https://packagist.org/packages/league/factory-muffin)
-
-The goal of this package is to enable the rapid creation of objects for the purpose of testing.
-
-It's basically a "[factory\_girl](https://github.com/thoughtbot/factory_girl)", simplified for use with PHP.
-
+## Motivation
+1. Configurable creation model.
+2. Configurable model setter.
+3. Define not only by class name.
+4. Define not only from root class definition.
+5. Define from any parent definition.
 
 ## Installing
 
